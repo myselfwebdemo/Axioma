@@ -1,25 +1,218 @@
 import UI from './Game.module.css'
 
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { v7 as uuidv7 } from 'uuid';
 
-const DEFAULT_FIELD =[
-  [1,2,3,4,5,6,7,8,9],
-  [1,1,1,2,1,3,1,4,1],
-  [5,1,6,1,7,1,8,1,9],
-]
+// TODO
+// – Iimplement hint: highlight numbers in between when cannot cross
+// – Should save current selection (one cell selected)?
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-const MOVE_DELAY_MS = 100; 
+console.log(screen)
 
-interface CellChoice {
+type Cell = {
   id: string;
   value: number;
-  row: number;
-  col: number;
+  isCrossed: boolean;
+  isSelected: boolean;
+};
+
+type Field = Cell[][]
+
+type FieldDispatch = Dispatch<SetStateAction<Cell[][]>>
+type BooleanDispatch = Dispatch<SetStateAction<boolean>>
+
+const gencell = (id: string, value: number) => {
+  return {id: id, value: value, isCrossed: false, isSelected: false}
+}
+
+// Action
+const completeMove = async (
+  field: Field,
+  setField: FieldDispatch,
+  setWaiting: BooleanDispatch,
+  setSelection: BooleanDispatch,
+  [C1, C2]: Cell[],
+) => {
+  setWaiting(true)
+  
+  const updatedField: Field = field.map(row => 
+    row.map(cell => {
+      return cell.id === C1.id || cell.id === C2.id 
+        ? { ...cell, isCrossed: true, isSelecellted: false } : cell
+    })
+  ) as unknown as Field
+  setField(updatedField);
+  
+  saveGame(updatedField)
+  resetChoices(setField, setSelection)
+  setWaiting(false)
+  // updateGameData('moves', gameData['moves']+1)
+}
+
+const wrongPairSelected = async (
+  setAreWrongChoices: BooleanDispatch,
+  setField: FieldDispatch,
+  setSelection: BooleanDispatch
+) => {
+  setAreWrongChoices(true)
+
+  await sleep(300)
+  resetChoices(setField, setSelection)
+  setAreWrongChoices(false)
+}
+
+const checkMatch = (
+  field: Field,
+  setAreWrongChoices: BooleanDispatch,
+  setField: FieldDispatch,
+  selectedCells: Cell[],
+  setWaiting: BooleanDispatch,
+  setSelection: BooleanDispatch
+) => {
+  if (areFollowing(field, selectedCells)) {
+    completeMove(field, setField, setWaiting, setSelection, selectedCells)
+  } else if (verticallyAligned(field, selectedCells)) {
+    completeMove(field, setField, setWaiting, setSelection, selectedCells)
+  } else {
+    wrongPairSelected(setAreWrongChoices, setField, setSelection)
+  }
+}
+
+const resetChoices = (setField: FieldDispatch, setSelection: BooleanDispatch) => {
+  setField((prevField: Field) => 
+    prevField.map(row => 
+      row.map(cell => ({
+        ...cell,
+        isSelected: false
+      }))
+    )
+  );
+  setSelection(false)
+}
+
+const deal = (
+  field: Field,
+  setField: FieldDispatch,
+  hasEverDealt: boolean,
+  setHasEverDealt: BooleanDispatch,
+) => {
+  if (!hasEverDealt) setHasEverDealt(true)
+
+  const activeNumbers: Cell[] = field.flat().filter(cell => !cell.isCrossed)
+  
+  if (activeNumbers.length === 0) return;
+
+  const tempFlatField: Cell[] = [...field.flat(), ...activeNumbers]
+  const freshField: Cell[][] = []
+
+  for (let row=0; row<tempFlatField.length; row+=colsPerRow) {
+    const rarr = []
+    while (rarr.length < colsPerRow && row+rarr.length < tempFlatField.length) {
+      const cell: Cell = {...tempFlatField[row+rarr.length], id: uuidv7()}
+      rarr.push(cell)
+    }
+    if (rarr.some(cell => !cell.isCrossed)) freshField.push(rarr);
+  }
+
+  setField(freshField);
+  saveGame(freshField);
+  // updateGameData('deals', gameData['deals']+1)
+}
+
+// function updateGameData(key: string, val: number) {
+//   setGameData({
+//     "moves": key == "moves" ? val : gameData["moves"],
+//     "deals": key == "deals" ? val : gameData['deals']
+//   })
+
+//   console.log(!movesCounterRef.current || !dealsCounterRef.current)
+//   if (!movesCounterRef.current || !dealsCounterRef.current) return
+//   if (key === "moves") {
+//     const currentSize = parseFloat(getComputedStyle(movesCounterRef.current).fontSize);
+//     movesCounterRef.current.style.fontSize = `${currentSize + .2}px`;
+//     return;
+//   }
+
+//   const currentSize = parseFloat(getComputedStyle(dealsCounterRef.current).fontSize);
+//   dealsCounterRef.current.style.fontSize = `${currentSize + 2}px`;
+// }
+{}
+
+// Selection
+const isSelectionOverflow = (field: Field, checkExact?: boolean) => {
+  const selected = field.flat().filter(cell => cell.isSelected).length
+  return checkExact ? selected === 2 : selected >= 2
+}
+
+const checkTwinXRules = (C1: Cell, C2: Cell) => {
+  if (C1.value == C2.value || C1.value + C2.value == 10) return true
+  return false
+}
+
+const areFollowing = (field: Field, [C1, C2]: Cell[]) => {
+  const flatField = field.flat()
+  const idx1 = flatField.findIndex(cell => cell.id === C1.id);
+  const idx2 = flatField.findIndex(cell => cell.id === C2.id);
+  
+  for (let i = idx1+1; i<idx2; i++) {
+    if (!flatField[i].isCrossed) return false;
+  }
+
+  return checkTwinXRules(C1, C2)
+}
+
+const verticallyAligned = (field: Field, [C1, C2]: Cell[]) => {
+  const flatField = field.flat()
+  const idx1 = flatField.findIndex(cell => cell.id === C1.id);
+  const idx2 = flatField.findIndex(cell => cell.id === C2.id);
+  const colidx = idx1%colsPerRow
+  const rowidx1 = Math.floor(idx1/colsPerRow)
+  const rowidx2 = Math.floor(idx2/colsPerRow)
+
+  if (colidx != idx2%colsPerRow) return false;
+  
+  if (rowidx2 - rowidx1 != 1) {
+    for (let i = rowidx1+1; i<rowidx2; i++) {
+      if (!field[i][colidx].isCrossed) return false;
+    }
+  }
+
+  return checkTwinXRules(C1, C2)
+}
+
+// Utility
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+const selectedCells = (field: Field): Cell[] => {
+  let s1: Cell | null = null
+  let s2: Cell | null = null
+
+  field.forEach(row => {row.forEach(cell => {if (cell.isSelected) !s1 ? s1 = cell : s2 = cell; return;})})
+  return [s1!, s2!]
+}
+
+const saveGame = (field: Field) => {
+  localStorage.setItem("field", JSON.stringify(field));
+}
+
+// Configurational constants
+const Ns =[1,2,3,4,5,6,7,8,9,1,1,1,2,1,3,1,4,1,5,1,6,1,7,1,8,1,9]
+const isMobile = screen.width < screen.height
+const colsPerRow = 9
+
+// Initial FIELD generation
+const FIELD: Field = []
+for (let row=1; row<20; row+=colsPerRow) {
+  const rarr = []
+  while (rarr.length < colsPerRow) {
+    const cell = gencell(uuidv7(), Ns[(row-1)+rarr.length])
+    rarr.push(cell)
+  }
+  FIELD.push(rarr)
 }
 
 function Game() {
-  const [field, setField] = useState<(number | null)[][]>(() => {
+  const [field, setField] = useState<Field>(() => {
     const savedData = localStorage.getItem("field");
     
     if (savedData) {
@@ -30,230 +223,148 @@ function Game() {
         alert("Error while loading saved game. Starting new game")
       }
     }
-    
-    return DEFAULT_FIELD;
+
+    return FIELD;
   })
-  const [crossedNs, setCrossedNs] = useState<Set<string>>(() => {
-    const savedData = localStorage.getItem("crossedNs");
-    if (savedData) {
-      try {
-        return new Set(JSON.parse(savedData));
-      } catch (e) {
-        console.error("Error parsing crossed numbers:", e);
-      }
-    }
-    return new Set<string>();
-  });
-  const [choices, setChoices] = useState<CellChoice[]>([])
-  const deselectBtnRef = useRef<HTMLImageElement | null>(null)
-  const rulesBtnRef = useRef<HTMLImageElement | null>(null)
-  const resetBtnRef = useRef<HTMLImageElement | null>(null)
-  const gameWrapperRef = useRef<HTMLDivElement | null>(null)
-
-  var hasEverDealt = false
-  var awaitingCompleteMove = false
-  const [areWrongChoices, setAreWrongChoices] = useState(false)
-
-  function saveGame(field: (number | null)[][], crossedSet: Set<string> = new Set()) {
-    localStorage.setItem("field", JSON.stringify(field));
-    localStorage.setItem("crossedNs", JSON.stringify(Array.from(crossedSet)));
-  }
-
-
-  async function cellClick(cellId: string, value: number, rowIndex: number, colIndex: number) {
-    if (awaitingCompleteMove) return
-    if (choices.some(choice => choice.id === cellId)) return  
-    if (choices.length >= 2) return
+  const fieldWrapperRef = useRef<HTMLDivElement | null>(null)
+  // const [gameData, setGameData] = useState<Record<string, number>>({
+  //   "moves": 0, "deals": 0 })
+  // const movesCounterRef = useRef<HTMLParagraphElement | null>(null)
+  // const dealsCounterRef = useRef<HTMLParagraphElement | null>(null)
   
-    const newChoice = { id: cellId, value, row: rowIndex, col: colIndex }
-    const updatedChoices = [...choices, newChoice]
-    
-    setChoices(updatedChoices)
-    await sleep(50)
-    if (updatedChoices.length == 2) checkMatch(updatedChoices)
-  }
+  const [hasEverDealt, setHasEverDealt] = useState<boolean>(false)
+  const [areWrongChoices, setAreWrongChoices] = useState<boolean>(false)
+  const [waiting, setWaiting] = useState<boolean>(false)
+  const [isSelection, setSelection] = useState<boolean>(false)
+  const [isResetting, setResetting] = useState<boolean>(false)
 
-  async function completeMove(currentChoices: CellChoice[]) {
-    awaitingCompleteMove = true
-    await sleep(MOVE_DELAY_MS);
-    
-    const id1 = currentChoices[0].id;
-    const id2 = currentChoices[1].id;
-
-    if (!crossedNs.has(id1) || !crossedNs.has(id2)) {
-      const updatedCrossed = new Set(crossedNs);
-      updatedCrossed.add(id1);
-      updatedCrossed.add(id2);
-      
-      setCrossedNs(updatedCrossed);
-      saveGame(field, updatedCrossed);
-    }
-    
-    setChoices([]);  
-    awaitingCompleteMove = false
-  }
-
-  async function wrongPairSelected() {
-    setAreWrongChoices(true)
-
-    await sleep(MOVE_DELAY_MS * 2)
-    setChoices([])
-    setAreWrongChoices(false)
-  }
+  const cellClick = async (cell: Cell) => {
+    if (waiting || cell.isSelected || isSelectionOverflow(field)) return
   
-  // Rules
-  function checkTwinXRules(currentChoices: CellChoice[]) {
-    const c1 = currentChoices[0]
-    const c2 = currentChoices[1]
-    if (c1.value == c2.value || c1.value + c2.value == 10) return true
-    return false
-  }
+    const updatedField: Field = field.map(row => 
+      row.map(c => c.id === cell.id ? { ...c, isSelected: true } : c)
+    ) as unknown as Field
+    setField(updatedField);
+    if (!isSelection) setSelection(true)
 
-  function areFollowing (currentChoices: CellChoice[]) {
-    const c1 = currentChoices[0]
-    const c2 = currentChoices[1]
-
-    const isFirstC1 = c1.row < c2.row || (c1.row === c2.row && c1.col < c2.col)
-    const first = isFirstC1 ? c1 : c2
-    const second = isFirstC1 ? c2 : c1
-
-    const columnsPerRow = field[0].length
-
-    const startFlatIndex = first.row * columnsPerRow + first.col
-    const endFlatIndex = second.row * columnsPerRow + second.col
-
-    for (let i = startFlatIndex + 1; i < endFlatIndex; i++) {
-      const r = Math.floor(i / columnsPerRow)
-      const c = i % columnsPerRow
-
-      if (!crossedNs.has(`${r}-${c}`)) return false;
+    await sleep(100)
+    if (isSelectionOverflow(updatedField, true)) {
+      checkMatch(
+        updatedField,
+        setAreWrongChoices,
+        setField,
+        selectedCells(updatedField),
+        setWaiting,
+        setSelection
+      )
     }
-
-    return checkTwinXRules(currentChoices)
   }
 
-  function verticallyAligned (currentChoices: CellChoice[]) {
-    const c1 = currentChoices[0]
-    const c2 = currentChoices[1]
-
-    if (c1.col !== c2.col) return false
-
-    const startRow = Math.min(c1.row, c2.row)
-    const endRow = Math.max(c1.row, c2.row)
-
-    for (let r = startRow + 1; r < endRow; r++) if (!crossedNs.has(`${r}-${c1.col}`)) return false
-    return checkTwinXRules(currentChoices)
+  const resetGame = () => {
+    setResetting(true)
+    resetChoices(setField, setSelection)
+    setField(FIELD)
+    saveGame(FIELD)
   }
-
-  function checkMatch (currentChoices: CellChoice[]) {
-    if (areFollowing(currentChoices)) {
-      completeMove(currentChoices)
-    } else if (verticallyAligned(currentChoices)) {
-      completeMove(currentChoices)
-    } else wrongPairSelected()
-  }
-
-  function deal() {
-    if (!hasEverDealt) hasEverDealt = true;
-    const activeNumbers: number[] = [];
-    field.forEach((row, rowIndex) => {
-      row.forEach((number, colIndex) => {
-        if (!crossedNs.has(`${rowIndex}-${colIndex}`) && number !== null) activeNumbers.push(number);
-      });
-    });
-
-    if (activeNumbers.length === 0) return;
-
-    const updatedFlatField = [...field.flat().filter((n): n is number => n != null), ...activeNumbers];
-
-    const columnsPerRow = 9;
-    const field2d: (number | null)[][] = [];
-    for (let i = 0; i < updatedFlatField.length; i += columnsPerRow) {
-      const row = updatedFlatField.slice(i, i + columnsPerRow);      
-      while (row.length < columnsPerRow) row.push(null as any);
-      field2d.push(row);
-    }
-
-    setField(field2d);
-    saveGame(field2d, crossedNs);
-  }
+  const clearChoices = () => {resetChoices(setField, setSelection)}
+  const setRulesBookState = () => {return}
 
   useEffect(() => {
-    function press(ev: KeyboardEvent) {if (ev.key === "Enter") {
-      deal();
-      setTimeout(() => {
-        window.scrollTo({top: gameWrapperRef.current?.scrollHeight, behavior: 'smooth'})
-      }, 10);
-    }};
+    function press(ev: KeyboardEvent) {if (ev.key === "Enter") deal(field, setField, hasEverDealt, setHasEverDealt)};
 
     document.body.addEventListener("keydown", press);
     return () => document.body.removeEventListener("keydown", press);
-  }, [field, crossedNs]);
+  }, [field]);
 
   useEffect(() => {
-    function clearChoices() {setChoices([])}
-    function openRules() {}
-    function resetGame() {setField(DEFAULT_FIELD); setCrossedNs(new Set()); setChoices([]); saveGame(DEFAULT_FIELD)}
-    
-    deselectBtnRef.current?.addEventListener("click", clearChoices)
-    rulesBtnRef.current?.addEventListener("click", openRules)
-    resetBtnRef.current?.addEventListener("click", resetGame)
-
-    return () => {
-      deselectBtnRef.current?.removeEventListener("click", clearChoices)
-      rulesBtnRef.current?.removeEventListener("click", openRules)
-      resetBtnRef.current?.removeEventListener("click", resetGame)
-    }
+    fieldWrapperRef.current?.style.setProperty('--gap', isMobile ? '0px' : '8px')
+    fieldWrapperRef.current?.style.setProperty('--cell-size', isMobile ? '40px' : '70px')
+    fieldWrapperRef.current?.style.setProperty('--font-size', isMobile ? '.55em' : '1em')
   }, [])
 
   return (
     <Fragment>
-      <div className={UI.controls}>
-        <img ref={deselectBtnRef} src="./icons/deselect.svg" alt="Deselect current choice" />
-        <img ref={rulesBtnRef} src="./icons/book.svg" alt="See rules" />
-        <img ref={resetBtnRef} src="./icons/reset.svg" alt="Start new game" />
-      </div>
-      
-      <div ref={gameWrapperRef} className={UI.wrapper}>
-        {field.map((row, rowIndex) => (
-          <div key={rowIndex} className={UI.row}>
-            {row.map((number, colIndex) => {
-              const cellId = `${rowIndex}-${colIndex}`
-              const isSelected = choices.some(choice => choice.id === cellId)
-              const isCrossed = crossedNs.has(cellId)
+      <div className={UI.game_wrapper}>
 
-              return (
-                <div key={cellId}>
-                  {!isCrossed ? number && (
-                    <div 
-                      className={UI.cell}
-                      onClick={() => cellClick(cellId, number!, rowIndex, colIndex)}
-                    >
-                      <img src={`/TX27/shapes/${number}${isSelected ? (areWrongChoices ? '-err' : '-selected') : ''}.svg`} />
-                      <p>{number}</p>
-                    </div>
-                  ) : (
-                    <div className={`${UI.cell} ${UI.crossed}`}><img src={`/TX27/shapes/${number}-distorted.png`} /></div>
-                  )}
-                </div>
-              )
-            })}
+        <div className={UI.header}>
+          <p>tx27</p>
+          <div className={UI.controls}>
+            <div className={UI.controls_img_wrapper}>
+              <img
+                className={`${isResetting ? UI.animreset : ''}`}
+                src="./icons/reset.svg"
+                alt="Start new game"
+                onClick={resetGame}
+                onAnimationEnd={() => setResetting(false)} />
+            </div>
+            <div className={UI.controls_img_wrapper}>
+              <img src="./icons/book.svg" alt="See rules" onClick={setRulesBookState} />
+            </div>
+            {isSelection ? (
+              <div className={UI.controls_img_wrapper}>
+                <img src="./icons/xmark.svg" alt="Deselect current choice" onClick={clearChoices} />
+              </div>
+            ) : ('')}
           </div>
-        ))}
+        </div>
+        
+        <div ref={fieldWrapperRef} className={UI.field_wrapper}>
+          {field.map((row, ridx) => (
+            <div key={ridx} className={UI.row}>
+              {row.map((cell,_) => {
+                return (
+                  <div key={cell.id}>
+                    {cell.isCrossed ? (
+                      <div className={`${UI.cell} ${UI.crossed}`}>
+                        <img id={UI.source_img} src={`/TX27/shapes/${cell.value}-selected.svg`} />
+                        <img id={UI.target_img} src={`/TX27/shapes/${cell.value}-distorted.png`} />
+                      </div>
+                    ) : (
+                      <div 
+                        className={UI.cell}
+                        onClick={() => cellClick(cell)}
+                      >
+                        <img src={`/TX27/shapes/${cell.value}${cell.isSelected ? (areWrongChoices ? '-err' : '-selected') : ''}.svg`} />
+                        <p>{cell.value}</p>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* <div className={UI.counters}>
+          <div>
+            <p ref={movesCounterRef}>{gameData["moves"]}</p>
+            <h4>moves</h4>
+          </div>
+          <div>
+            <p ref={dealsCounterRef}>{gameData["deals"]}</p>
+            <h4>deals</h4>
+          </div>
+        </div> */}
       </div>
 
-      {/* <div className={UI.counters}></div> */}
-
-      {/* {screen.width > screen.height ? (
-        <Fragment>{!hasEverDealt ? (
-            <div className={UI.how_to_deal_animation}></div>
-          ) : ('')}</Fragment>
+      {isMobile ? (
+        <button
+          className={UI.mobile_deal_btn}
+          onClick={() => {deal(field, setField, hasEverDealt, setHasEverDealt)}}
+        >deal</button>
       ) : (
-        <div></div>)
-      } */}
+        <Fragment>{!hasEverDealt ? (
+          <div className={UI.how_to_deal__animation}>
+            <div>
+              <p className={UI.catch_phrase}>Out of moves?</p>
+              <p>Press <strong>Enter</strong> to <i>deal</i> remaining numbers.</p>
+            </div>
+            <img src="/TX27/icons/arrow-down.svg" alt="arrow down" />
+          </div>
+        ) : ('')}</Fragment>
+      )}
     </Fragment>
   )
 }
 
 export default Game;
-

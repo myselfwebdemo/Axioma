@@ -1,16 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Stalinist+One&display=swap');
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: "Space Grotesk", sans-serif;
-  font-weight: 700;
-  font-size: x-large;
 }
 
 :root {
-  --theme-bg-color: #151515;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: x-large;
+
+  --theme-bg-color: #000;
+  /* --theme-bg-color: #151515; */
   --theme-bg2-color: #0c0c0c;
   
   --color-lib-n1: #ffc559;
@@ -23,6 +26,16 @@
   --color-lib-n3: #5083d8;
 }
 
+body {
+  height: 100%;
+  background: var(--theme-bg-color);
+  overflow: hidden;
+}
+
+strong {
+  font-weight: 900;
+}
+
 #root {
   width: 100vw;
   height: 100vh;
@@ -31,4 +44,16 @@
   background: var(--theme-bg-color);
   overflow: hidden;
   z-index: 0;
+}
+
+#root::before {
+  top: 0;
+  left: 0;
+  position: absolute;
+  content: "";
+  inset: 0;
+  background: url("/game-bg.png");
+  background-position: center;
+  background-size: cover;
+  filter: opacity(.1);
 }
