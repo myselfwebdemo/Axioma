@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Generator: Apple Native CoreSVG 341-->
+<!DOCTYPE svg
+PUBLIC "-//W3C//DTD SVG 1.1//EN"
+       "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 35.072 25.95">
+ <defs>
+  <linearGradient id="gradient1" x1="5" x2="5" y2="22.8607" gradientUnits="userSpaceOnUse">
+   <stop offset="0" stop-color="rgba(50,50,50,0.85)" stop-opacity="1"/>
+   <stop offset="1" stop-color="rgba(0,0,0,0.85)" stop-opacity="1"/>
+  </linearGradient>
+  <linearGradient id="gradient2" x1="5" x2="5" y2="22.8607" gradientUnits="userSpaceOnUse">
+   <stop offset="0" stop-color="rgba(50,50,50,0.85)" stop-opacity="1"/>
+   <stop offset="1" stop-color="rgba(0,0,0,0.85)" stop-opacity="1"/>
+  </linearGradient>
+  <linearGradient id="gradient3" x1="5" x2="5" y2="22.8607" gradientUnits="userSpaceOnUse">
+   <stop offset="0" stop-color="rgba(50,50,50,0.85)" stop-opacity="1"/>
+   <stop offset="1" stop-color="rgba(0,0,0,0.85)" stop-opacity="1"/>
+  </linearGradient>
+ </defs>
+ <g>
+  <rect height="25.95" opacity="0" width="35.072" x="0" y="0"/>
+  <path d="M15.4692 0.373632C15.8253 2.6957 16.1102 3.10938 18.5237 3.44766C18.7473 3.47695 18.9249 3.64199 18.9249 3.86387C18.9249 4.07598 18.7554 4.24551 18.5237 4.29434C16.1102 4.61484 15.9282 5.00898 15.4692 7.37364C15.4364 7.58399 15.2473 7.72422 15.053 7.72422C14.8346 7.72422 14.6634 7.57598 14.6323 7.35235C14.294 5.02051 14.0011 4.55879 11.5743 4.29434C11.3346 4.25527 11.1846 4.08399 11.1846 3.86387C11.1846 3.64199 11.3427 3.47695 11.5743 3.44766C14.0011 3.10938 14.1671 2.70547 14.6323 0.371875C14.6731 0.15 14.8427 0 15.053 0C15.2571 0 15.4364 0.15 15.4692 0.373632Z" fill="url(#gradient1)"/>
+  <path d="M11.5134 8.49082L14.6524 12.1437L10.1829 17.4813C9.73524 18.015 9.46329 18.5871 9.35338 19.1514L2.77274 19.1514C1.17528 19.1514 0.544229 17.4906 1.54598 16.3131L8.27587 8.49082C8.78563 7.8959 9.30594 7.60352 9.8866 7.60352C10.4753 7.60352 10.9956 7.8959 11.5134 8.49082Z" fill="url(#gradient2)"/>
+  <path d="M12.5796 21.4395L31.768 21.4395C33.5481 21.4395 34.2403 19.79 33.0805 18.4004L23.8575 7.38262C23.3512 6.77617 22.7811 6.45528 22.1782 6.45528C21.5718 6.45528 21.0114 6.77617 20.5016 7.38613L11.2751 18.4004C10.1073 19.782 10.811 21.4395 12.5796 21.4395Z" fill="url(#gradient3)"/>
+ </g>
+</svg>
