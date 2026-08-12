@@ -1,0 +1,192 @@
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 90deg;
+  inherits: false;
+}
+
+.overlay {
+    --blur: 1px;
+    top: 0;
+    left: 0;
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--sys-bg-color), var(--sys-bg-color-opaque) 30%, var(--sys-bg-color));
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    z-index: 9999;
+    
+    /* &::before {
+        inset: 0;
+        border: solid 15px;
+        border-image: linear-gradient(var(--angle), var(--theme-color), transparent 10% 90%, var(--theme-color));
+        border-image-slice: 1;
+        mask-image: linear-gradient(to top, rgb(0 0 0 / .1) 10%, black 30% 70%, rgb(0 0 0 / .1) 90%);
+        filter: blur(50px);
+        animation: spin 20s linear infinite;
+    } */
+}
+
+.message {
+    position: relative;
+    width: min(704px, 86%);
+    min-height: 130px;
+    height: fit-content;
+    margin-top: -20%;
+    padding: 22px;
+    padding-left: 28px;
+    background: linear-gradient(var(--angle), var(--theme-color), transparent 60%);
+    border-radius: 27px;
+    animation: spin 10s infinite;
+    z-index: 0;
+    
+    &::before {
+        inset: 2px;
+        background: var(--sys-bg-color);
+        border-radius: 26px;
+        box-shadow:
+            inset var(--sys-bg-shift-step-1) var(--sys-bg-shift-step-1) var(--sys-bg-ints-step-1) var(--sys-bg-color-light-step-1),
+            inset var(--sys-bg-shift-step-2) var(--sys-bg-shift-step-2) var(--sys-bg-ints-step-2) var(--sys-bg-color-light-step-2),
+            inset calc(var(--sys-bg-shift-step-1) * -1) calc(var(--sys-bg-shift-step-1) * -1) var(--sys-bg-ints-step-1) var(--sys-bg-color-dark-step-1),
+            inset calc(var(--sys-bg-shift-step-2) * -1) calc(var(--sys-bg-shift-step-2) * -1) var(--sys-bg-ints-step-2) var(--sys-bg-color-dark-step-2);
+        z-index: -1;
+    }
+
+    h1 {
+        padding-left: 4px;
+        font-size: 20px;
+        text-transform: capitalize;
+        background: var(--theme-color);
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+    }
+
+    p {
+        margin: 10px 0 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary-color);
+    }
+
+    h3 {
+        margin: 12px 0 10px;
+        color: var(--text-secondary-color);
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: underline;
+    }
+}
+
+@keyframes spin {
+    from {--angle: 0deg;}
+    to {--angle: 360deg;}
+}
+
+.silence_option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    height: 18px;
+    margin-top: 16px;
+    padding-left: 6px;
+
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;  
+        width: 18px;
+        height: 18px;
+        border: solid 1.7px #ccc;
+        border-radius: 6px;
+        background-color: var(--sys-bg-color-lighter);
+        cursor: pointer;
+        display: inline-grid;
+        place-content: center;
+        transition: var(--sys-transition);
+    }
+    
+    input[type="checkbox"]:checked {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+        border-radius: 3px;
+        background-color: var(--theme-color);
+        border-color: var(--theme-color);
+        box-shadow: 
+            0 0 .1vh var(--theme-color),
+            0 0 .2vh var(--theme-color),
+            0 0 .3vh var(--theme-color),
+            0 0 .4vh var(--theme-color),
+            0 0 .5vh var(--theme-color),
+            0 0 .6vh var(--theme-color),
+            0 0 .7vh var(--theme-color),
+            0 0 .8vh var(--theme-color),
+            0 0 .9vh var(--theme-color),
+            0 0 1vh var(--theme-color);
+    }
+    
+    input[type="checkbox"]:checked::before {
+        content: "✓";
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    label {
+        font-size: 14px;
+        font-weight: 500;
+        transition: var(--sys-transition);
+    }
+
+    input[type="checkbox"]:checked ~ label {
+        color: var(--theme-color);
+    }
+}
+
+.actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    gap: 12px;
+}
+
+.actions button {
+    all: unset;
+    min-width: 32px;
+    padding: 4px 12px;
+    background: var(--theme-color);
+    border-radius: 100px;
+    color: var(--text-primary-dark-color);
+    font-size: 14px;
+    text-transform: capitalize;
+    text-align: center;
+}
+
+.cancel_btn {
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    -webkit-background-clip: text !important;
+    transform: scale(.92) !important;
+}
+
+.actions button:last-child {
+    box-shadow: 
+        0 0 .1vh var(--theme-color),
+        0 0 .2vh var(--theme-color),
+        0 0 .3vh var(--theme-color),
+        0 0 .4vh var(--theme-color),
+        0 0 .5vh var(--theme-color),
+        0 0 .6vh var(--theme-color),
+        0 0 .7vh var(--theme-color),
+        0 0 .8vh var(--theme-color),
+        0 0 .9vh var(--theme-color),
+        0 0 1vh var(--theme-color),
+        0 0 1.5vh var(--theme-color),
+        0 0 2vh var(--theme-color);
+}

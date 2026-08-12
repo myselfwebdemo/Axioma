@@ -1,34 +1,170 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Stalinist+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Climate+Crisis:YEAR@1979&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tilt+Prism&display=swap');
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+* > ::-webkit-scrollbar {
+  display: none;
 }
 
 :root {
-  font-family: "Space Grotesk", sans-serif;
-  font-weight: 700;
-  font-size: x-large;
+  font-family: "henken grotesk", sans-serif;
+  font-weight: 600;
+  font-size: medium;
 
-  --theme-bg-color: #000;
-  /* --theme-bg-color: #151515; */
-  --theme-bg2-color: #0c0c0c;
+  --sys-success-color: #2cff05;
+  --sys-success-color-light: #84ff6e;
+  --sys-success-color-opaque: #2bff0552;
+  --sys-alert-color: #ffd500;
+  --sys-alert-color-light: #ffe872;
+  --sys-alert-color-opaque: #ffd50053;
+  --sys-danger-color: #ff0800;
+  --sys-danger-color-light: #ff7672;
+  --sys-danger-color-opaque: #ff080053;
+  --sys-orange-color: #f09849;
+  --sys-orange-color-light: #f4ba80;
+  --sys-orange-color-opaque: #f0974956;
   
-  --color-lib-n1: #ffc559;
-  --color-lib-n1: #c7c7c7;
-  --color-lib-n1: #8564f0;
-  --color-lib-n2: #812a2d;
-  --color-lib-n2: #fd0008;
-  --color-lib-n2: #00fb00;
-  --color-lib-n3: #55bceb;
-  --color-lib-n3: #5083d8;
+  --sys-primary-dark-color: rgb(5 5 15);
+  --sys-primary-light-color: rgb(240 240 255);
+  --sys-primary-teal-color: #00fff5;
+  --sys-primary-dark-teal-color: #003b41;
+  --sys-primary-light-teal-color: #ccfffc;
+  --sys-primary-dark-forest-color: #001d16;
+  --sys-primary-light-forest-color: #2dff92;
+  --sys-primary-void-forest-color: #054b3c;
+  --sys-primary-iris-color: #bb86fc;
+  --sys-primary-dark-iris-color: #1a0039;
+  --sys-primary-light-iris-color: #f0e4ff;
+  --sys-primary-neon-violet-color: #f824c9;
+  --sys-primary-crimson-color: #c61e18;
+  --sys-primary-dark-crimson-color: #110000;
+
+  --sys-bg-color-light-step-1: oklch(from var(--sys-bg-color) calc(l + 0.05) c h);
+  --sys-bg-color-light-step-2: oklch(from var(--sys-bg-color) calc(l + 0.15) c h);
+  --sys-bg-color-dark-step-1:  oklch(from var(--sys-bg-color) calc(l - 0.05) c h);
+  --sys-bg-color-dark-step-2:  oklch(from var(--sys-bg-color) calc(l - 0.16) c h);
+  
+  --text-secondary-color: oklch(from var(--text-primary-color) calc(l - 0.40) c h / .5);
+  --text-tetriary-color: oklch(from var(--text-primary-color) calc(l - 0.60) c h / .5);
+  
+  --sys-bg-shift-step-1: 2px;
+  --sys-bg-shift-step-2: 4px;
+  --sys-bg-ints-step-1: 2px;
+  --sys-bg-ints-step-2: 4px;
+  
+  --sys-bg-nshift-step-1: 2px;
+  --sys-bg-nshift-step-2: 4px;
+  --sys-bg-nints-step-1: 2px;
+  --sys-bg-nints-step-2: 4px;
+  
+  --sys-transition: .3s;
+  
+  /* Should keep? */
+  --sys-color: #3479f8;
+  --sys-color-lighter: #599afa;
+  --sys-blue-gradient: linear-gradient(to bottom, #599afa, var(--sys-color)); /* Exists in not_standalone_case */
+  --sys-green-gradient: linear-gradient(to bottom, #87e18d, #69d068); /* Exists in not_standalone_case */
+}
+
+[data-theme='vortex'], :root {
+  --sys-bg-color: var(--sys-primary-dark-color);
+  --sys-bg-color-opaque: rgb(5 5 15 / .5);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-filter: invert(100%);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='halo'] {
+  --sys-bg-color: var(--sys-primary-light-color);
+  --text-primary-color: var(--sys-primary-dark-color);
+  --sys-filter: none;
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-dark-color);
+}
+
+[data-theme='vortex_teal'] {
+  --sys-bg-color: var(--sys-primary-dark-teal-color);
+  --sys-accent-color: var(--sys-primary-teal-color);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='vortex_iris'] {
+  --sys-bg-color: var(--sys-primary-dark-iris-color);
+  --sys-accent-color: var(--sys-primary-iris-color);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='halo_iris'] {
+  --sys-bg-color: var(--sys-primary-light-iris-color);
+  --sys-accent-color: var(--sys-primary-iris-color);
+  --text-primary-color: var(--sys-primary-dark-color);
+  --sys-filter: none;
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='forest'] {
+  --sys-bg-color: var(--sys-primary-dark-forest-color);
+  --sys-accent-color: var(--sys-primary-light-forest-color);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='crimson_supernova'] {
+  --sys-bg-color: var(--sys-primary-dark-crimson-color);
+  --sys-accent-color: var(--sys-primary-crimson-color);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='void_teal'] {
+  --sys-bg-color: var(--sys-primary-dark-color);
+  --sys-accent-color: var(--sys-primary-teal-color);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='void_forest'] {
+  --sys-bg-color: var(--sys-primary-dark-color);
+  --sys-accent-color: var(--sys-primary-void-forest-color);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='void_iris'] {
+  --sys-bg-color: var(--sys-primary-dark-color);
+  --sys-accent-color: var(--sys-primary-iris-color);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='void_neon_violet'] {
+  --sys-bg-color: var(--sys-primary-dark-color);
+  --sys-accent-color: var(--sys-primary-neon-violet-color);
+  --text-primary-color: var(--sys-primary-light-color);
+  --sys-theme-selected-indicator-border-color: var(--sys-primary-light-color);
+}
+
+[data-theme='TEMPLATE'] {
+  --sys-bg-color: black;
+  --sys-accent-color: red; /* OPTIONAL */
+  --text-primary-color: white;
+  --sys-filter: invert(0%); /* OPTIONAL */
+  --sys-theme-selected-indicator-border-color: white;
 }
 
 body {
   height: 100%;
-  background: var(--theme-bg-color);
+  background: var(--sys-bg-color);
   overflow: hidden;
 }
 
@@ -40,20 +176,8 @@ strong {
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  background: var(--theme-bg-color);
   overflow: hidden;
   z-index: 0;
-}
-
-#root::before {
-  top: 0;
-  left: 0;
-  position: absolute;
-  content: "";
-  inset: 0;
-  background: url("/game-bg.png");
-  background-position: center;
-  background-size: cover;
-  filter: opacity(.1);
 }
