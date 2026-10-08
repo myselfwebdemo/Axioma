@@ -45,6 +45,7 @@
 
 – Character abilities:
    Active
+   0. Allow to deal right away in the beginning of the game, or deal at any time without making move.
    1. Swap positions of any two numbers on the field plane
    2. Move finger on row/column to sweep it completely.
       :: Double tap to sweep (instead of moving through whole row/column).

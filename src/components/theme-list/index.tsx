@@ -1,26 +1,26 @@
 import UI from './index.module.css'
-import MCSS from '../../game/Game.module.css'
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import MCSS from '../../pages/game/index.module.css'
+import { useState, type Dispatch } from 'react'
 
 type TList = {
     sysOptions: string[]
     currentTheme: string
-    setTheme: Dispatch<SetStateAction<string>>
+    interfaceDispatch: Dispatch<any>
     scrollEvent: Function
 }
 
-const ThemeList = ({sysOptions, currentTheme, setTheme, scrollEvent}: TList) => {
+const ThemeList = ({sysOptions, currentTheme, interfaceDispatch, scrollEvent}: TList) => {
     const [scheduledTheme, scheduleTheme] = useState(currentTheme);
 
     return (
         <div className={MCSS.list}>
-            <h1>system theme</h1>
+            <h1>color theme</h1>
 
             <div className={UI.scroll_wrapper}>
                 <div
                     className={UI.scroll_content}
                     onScroll={(e) => scrollEvent(e, currentTheme, scheduleTheme, false)}
-                    onScrollEnd={() => setTheme(scheduledTheme)}
+                    onScrollEnd={() => interfaceDispatch({ act: 'SET_INTERFACE_THEME', theme: scheduledTheme })}
                 >
                     {sysOptions.map(option => (
                         <div
@@ -40,6 +40,11 @@ const ThemeList = ({sysOptions, currentTheme, setTheme, scrollEvent}: TList) => 
                     ))}
                 </div>
             </div>
+
+            {/* <div className={UI.image_drop_wrapper}>
+                <input type="file" />
+                <p>add your image here</p>
+            </div> */}
         </div>
     )
 }

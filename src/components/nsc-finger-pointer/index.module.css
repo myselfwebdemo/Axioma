@@ -1,0 +1,13 @@
+.tap {
+        position: relative;
+        width: fit-content;
+        height: fit-content;
+        
+        img {
+            --size: 20px;
+            position: absolute;
+            width: var(--size) !important;
+            height: var(--size) !important;
+            transform: scaleX(-1) rotate(135deg);
+        }
+    }
